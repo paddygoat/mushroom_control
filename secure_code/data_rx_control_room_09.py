@@ -16,6 +16,10 @@ import math
 import time
 # import ftputil
 import urllib.request
+from collections import deque
+from colorama import Fore, Back, Style
+from sys import stdout
+from time import sleep
 
 end = "\n"
 RED = "\x1b[1;31m"
@@ -30,8 +34,9 @@ Blink = "\x1b[5m"
 errorCount = 0
 error_utf8_decode = False
 counter = 0
-
+print("")
 sys.stderr.write("\x1b[94m" + "Start: " + '\x1b[0m' + end) 
+print(Fore.YELLOW)
 
 #initialize serial port
 ser = serial.Serial()
@@ -51,6 +56,7 @@ if ser.is_open==True:
         ser.write(b'Serial port is open.\n')
 	# print(ser, "\n") # print serial parameters
 
+print(Fore.GREEN)
 # Create figure for plotting
 fig = plt.figure(figsize=(10,5))
 ax = fig.add_subplot(1, 1, 1)
@@ -61,6 +67,7 @@ ycoTwo = [] # Container CO2/10 values
 ypmA = [] # Container particulate values
 ypmB = [] # Container particulate values
 ypmC = [] # Container particulate values
+test = []
 
 ytempGlass = []
 ymoisGlass = []
@@ -233,6 +240,9 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
         # print("myStringLabel:",myStringLabel)
         # print("myStringValue:",myStringValue)
 
+        stdout.write("- - ")
+        stdout.flush()
+
         if headerGlassTest == True:
             # print("Glasshouse header was detected !!!")
             if (myStringLabel == "mois"):
@@ -270,7 +280,8 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
                 error_utf8_decode == False
             else:
                 if myStringLabel == "temp":
-                    print("")
+                    print(Fore.WHITE)
+                    # print("")
                     yhum.append(data_y_hum[0])
                     ytempCon.append(data_y_tempCon[0])
                     ycoTwo.append(data_y_coTwo[0])
@@ -281,13 +292,44 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
                     ytempGlass.append(data_y_tempGlass[0])
                     ymoisGlass.append(data_y_moisGlass[0])
 
+                    xs = range(len(yhum))
+
+                    # Limit x and y lists to 2880 items (48 hours)
+                    # xs = xs[-2880:]
+
+
+                    # Limit x and y lists to 2880 items (? hours)
+                    # print("len(xs): ",len(xs))
+                    # if len(xs) > 2:
+                        # xs = xs[1:]    # gets rid of the 1st item
+                        # print("len(xs)_after: ",len(xs))
+                        # yhum = yhum[1:]
+                        # print("yhum_1: ",yhum)
+                        # ytempCon = ytempCon[1:]
+                        # ycoTwo = ycoTwo[1:]
+                        # ypmA = ypmA[1:]
+                        # ypmB = ypmB[1:]
+                        # ypmC = ypmC[1:]
+                        # ytempGlass = ytempGlass[1:]
+                        # ymoisGlass = ymoisGlass[1:]
+                        # return xs
+                        # return yhum
+                        # return ytempCon
+                        # return ycoTwo
+                        # return ypmA
+                        # return ypmB
+                        # return ypmC
+                        # return ytempGlass
+                        # return ymoisGlass
+                    # print("yhum_2: ",yhum)
+
                     # session = ftplib.FTP('185.65.237.84','paddygoat2@goatindustries.co.uk','Whales1966!')
                     # dir = 'bat_detector/results'
                     # session.mkd(dir)
 
-                    sendPath2 = 'http://###########################.php?temp='+str(data_y_tempCon[0])+'&hum='+str(data_y_hum[0])+'&cotwo='+str(data_y_coTwo[0])+'&pma='+str(data_y_pmA[0])+'&pmb='+str(data_y_pmB[0])+'&pmc='+str(data_y_pmC[0])
+                    sendPath2 = 'http://www.goatindustries.co.uk/mushroom_mafia/send.php?temp='+str(data_y_tempCon[0])+'&hum='+str(data_y_hum[0])+'&cotwo='+str(data_y_coTwo[0])+'&pma='+str(data_y_pmA[0])+'&pmb='+str(data_y_pmB[0])+'&pmc='+str(data_y_pmC[0])
                     webUrl2 = urllib.request.urlopen(sendPath2)
-                    print("Result code: " + str(webUrl2.getcode()))
+                    print("urllib.request result code: " + str(webUrl2.getcode()))
 
                     a = len(yhum)
                     b = len(ytempCon)
@@ -299,7 +341,7 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
                     h = len(ymoisGlass)
 
                     # Check the shapes of the data are coherent:
-                    xs = range(len(yhum))
+                    # xs = range(len(yhum))
                     # print("Length of xs = ",xs)
                     # print("Length of yhum = ",a)
                     # print("Length of ytempCon = ",b)
@@ -341,6 +383,47 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
                     # print("Error count = ",errorCount)
                     # print("Now make the plot ..... ")
 
+                    # Limit x and y lists to 2880 items (48 hours)
+                    # print("")
+                    xs = xs[-1440:]
+                    print("xs: ",xs)
+                    print(Fore.GREEN, end='')
+                    yhum = yhum[-1440:]
+                    # print("yhum: ",yhum)
+                    ytempCon = ytempCon[-1440:]
+                    # print("ytempCon: ",ytempCon)
+                    ycoTwo = ycoTwo[-1440:]
+                    # print("ycoTwo: ",ycoTwo)
+                    ypmA = ypmA[-1440:]
+                    # print("ypmA: ",ypmA)
+                    ypmB = ypmB[-1440:]
+                    # print("ypmB: ",ypmB)
+                    ypmC = ypmC[-1440:]
+                    # print("ypmC: ",ypmC)
+                    ytempGlass = ytempGlass[-1440:]
+                    # print("ytempGlass: ",ytempGlass)
+                    ymoisGlass = ymoisGlass[-1440:]
+                    # print("ymoisGlass: ",ymoisGlass)
+
+                    # print("")
+                    # xs_plot = xs[-3:]
+                    # print("xs_plot: ",xs_plot)
+                    # yhum_plot = yhum[-3:]
+                    # print("yhum_plot: ",yhum_plot)
+                    # ytempCon_plot = ytempCon[-3:]
+                    # print("ytempCon_plot: ",ytempCon_plot)
+                    # ycoTwo_plot = ycoTwo[-3:]
+                    # print("ycoTwo_plot: ",ycoTwo_plot)
+                    # ypmA_plot = ypmA[-3:]
+                    # print("ypmA_plot: ",ypmA_plot)
+                    # ypmB_plot = ypmB[-3:]
+                    # print("ypmB_plot: ",ypmB_plot)
+                    # ypmC_plot = ypmC[-3:]
+                    # print("ypmC_plot: ",ypmC_plot)
+                    # ytempGlass_plot = ytempGlass[-3:]
+                    # print("ytempGlass_plot: ",ytempGlass_plot)
+                    # ymoisGlass_plot = ymoisGlass[-3:]
+                    # print("ymoisGlass_plot: ",ymoisGlass_plot)
 
                     # Draw x and y lists
                     ax.clear()
@@ -391,17 +474,7 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
   
         # print("char_data:",char_data)
 
-        # Limit x and y lists to 2880 items (? hours)
-        if len(xs) > 2880:
-            xs = xs[1:]    # gets rid of the 1st item
-            yhum = yhum[1:]
-            ytempCon = ytempCon[1:]
-            ycoTwo = ycoTwo[1:]
-            ypmA = ypmA[1:]
-            ypmB = ypmB[1:]
-            ypmC = ypmC[1:]
-            ytempGlass = ytempGlass[1:]
-            ymoisGlass = ymoisGlass[1:]
+
 
 
         # Make a call back:
@@ -409,7 +482,9 @@ def animate(i, xs, yhum, ytempCon, ycoTwo, ypmA, ypmB, ypmC, ytempGlass, ymoisGl
         ser.write(b'D\n')
         delta_time[0] = round(time.time() - start_time, 5)
         # print("delta_time[0]: ",delta_time[0])
-        if delta_time[0] < 1.0:
+        if delta_time[0] < 1.0:        # Most comms are greater than 1 second as they come over LoRa.
+            print("threeDArray 3: ")
+            print(threeDArray)
             delta_time[1] = delta_time[0] + delta_time[1]
             # print("--- %s seconds ---" % round(time.time() - start_time, 5), " Counter[0]:  ",counter[0])
             print("Average process time = ",round(delta_time[1]/counter[0],5), " Counter[0]:  ",counter[0])
@@ -494,5 +569,25 @@ Traceback (most recent call last):
   File "/usr/lib/python3.6/urllib/request.py", line 1327, in do_open
     raise URLError(err)
 urllib.error.URLError: <urlopen error [Errno -2] Name or service not known>
+
+
+
+
+Traceback (most recent call last):
+  File "/home/paddy/.local/lib/python3.6/site-packages/matplotlib/backend_bases.py", line 1194, in _on_timer
+    ret = func(*args, **kwargs)
+  File "/home/paddy/.local/lib/python3.6/site-packages/matplotlib/animation.py", line 1442, in _step
+    still_going = Animation._step(self, *args)
+  File "/home/paddy/.local/lib/python3.6/site-packages/matplotlib/animation.py", line 1173, in _step
+    self._draw_next_frame(framedata, self._blit)
+  File "/home/paddy/.local/lib/python3.6/site-packages/matplotlib/animation.py", line 1192, in _draw_next_frame
+    self._draw_frame(framedata)
+  File "/home/paddy/.local/lib/python3.6/site-packages/matplotlib/animation.py", line 1742, in _draw_frame
+    self._drawn_artists = self._func(framedata, *self._args)
+  File "data_rx_control_room_09.py", line 107, in animate
+    char_data = char_data.decode("utf-8")
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x99 in position 14: invalid start byte
+
+
 '''
 
